@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Upload Files{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4">
+  <h3 class="mb-3">Upload Files</h3>
+
+  <form action="/generate-order/" method="post" enctype="multipart/form-data">
+    <label>Current Stock:</label>
+    <input type="file" name="files" required><br><br>
+
+    <label>Sales:</label>
+    <input type="file" name="files" required><br><br>
+
+    <label>On-way Stock:</label>
+    <input type="file" name="files" required><br><br>
+
+    <label>MinQ:</label>
+    <input type="file" name="files" required><br><br>
+
+    <label>Calendar:</label>
+    <input type="file" name="files" required><br><br>
+
+    <button type="submit" class="btn btn-primary">Generate Order</button>
+  </form>
+
+  <div class="mt-3 text-muted">
+    <div><b>ფაილების სახელები ზუსტად უნდა იყოს:</b></div>
+    <code>current_stock.xlsx</code>, <code>sales.xlsx</code>, <code>onway_stock.xlsx</code>, <code>MinQ.xlsx</code>, <code>Calendar.xlsx</code>
+  </div>
+</div>
+{% endblock %}
