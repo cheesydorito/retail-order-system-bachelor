@@ -1,0 +1,48 @@
+# Project Structure
+
+This document describes the folder structure of the Retail Order Automation System.
+
+## Root Directory
+
+retail-order-system-bachelor/
+
+- README.md – project overview and setup instructions
+- backend – main application code
+
+## Backend Structure
+
+backend/
+
+### main.py
+Main FastAPI application file.  
+Contains API endpoints and connects the application components.
+
+### database/
+
+Handles database configuration and data models.
+
+- database.py – database connection and session setup
+- models.py – SQLAlchemy database models
+- crud.py – database operations
+
+### services/
+
+Contains business logic of the system.
+
+- calculator.py – order calculation algorithm
+- validator.py – Excel data validation logic
+
+### templates/
+
+HTML templates rendered by FastAPI using Jinja2.
+
+- base.html – main layout
+- upload.html – Excel upload interface
+- history.html – order history page
+- dashboard.html – analytics dashboard
+
+### static/
+
+Static assets used by the frontend.
+
+- css/style.css – application styles
