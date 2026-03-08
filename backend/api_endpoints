@@ -1,0 +1,47 @@
+# API Endpoints
+
+This document describes the main API endpoints of the Retail Order Automation System.
+
+## Upload Page
+
+GET /ui/upload
+
+Displays the page where the user can upload Excel files for order generation.
+
+---
+
+## Generate Order
+
+POST /generate-order/
+
+Accepts five Excel files:
+
+- current_stock.xlsx
+- sales.xlsx
+- onway_stock.xlsx
+- MinQ.xlsx
+- Calendar.xlsx
+
+The system processes the data and calculates the optimal order quantities.
+
+The result is returned as a downloadable Excel file.
+
+---
+
+## Order History
+
+GET /ui/history
+
+Displays the list of previously generated orders stored in the database.
+
+---
+
+## Dashboard
+
+GET /ui/dashboard
+
+Displays analytics information such as:
+
+- Top suppliers
+- Top products
+- Average order quantity             
