@@ -1,0 +1,51 @@
+# System Architecture
+
+The Retail Order Automation System is designed as a web-based application using a layered architecture.
+
+## Main Components
+
+### 1. Frontend Layer
+The frontend is responsible for user interaction.  
+It provides pages for:
+- Excel file upload
+- Order history view
+- Dashboard analytics
+
+Frontend technologies:
+- HTML
+- CSS
+- Bootstrap
+- Jinja2 templates
+
+### 2. Backend Layer
+The backend handles:
+- HTTP request processing
+- file validation
+- order calculation logic
+- communication with the database
+- Excel result generation
+
+Backend technology:
+- FastAPI
+
+### 3. Database Layer
+The database layer stores generated order results and historical records.
+
+Database technology:
+- SQLite
+- SQLAlchemy ORM
+
+### 4. Service Layer
+The service layer contains the core business logic:
+- validation of uploaded Excel files
+- calculation of order quantities
+- aggregation of dashboard data
+
+## Data Flow
+
+1. User uploads Excel files
+2. Backend validates file structure and values
+3. System calculates optimal order quantities
+4. Results are stored in the database
+5. User can download results as Excel
+6. Historical data is visualized in dashboard and history pages
