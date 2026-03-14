@@ -1,0 +1,31 @@
+# System Workflow
+
+## Order Generation Process
+
+1. The user opens the upload page.
+2. The user uploads five Excel files:
+   - current_stock
+   - sales
+   - onway_stock
+   - MinQ
+   - Calendar
+3. The backend validates file names and column structure.
+4. The backend reads the Excel data into pandas DataFrames.
+5. The calculation module computes:
+   - lead time
+   - average daily sales
+   - forecast
+   - safety stock
+   - reorder point
+   - order quantity
+6. The result is stored in the database.
+7. The result is returned to the user as a downloadable Excel file.
+
+## Analytics Process
+
+1. Stored order data is read from the database.
+2. The dashboard aggregates:
+   - top suppliers
+   - top products
+   - average order quantity
+3. The result is shown in tables and charts.
