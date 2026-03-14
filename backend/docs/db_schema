@@ -1,0 +1,29 @@
+# Database Schema
+
+## Table: order_results
+
+The system stores generated order data in the `order_results` table.
+
+### Fields
+
+- id: Integer, primary key
+- created_at: DateTime
+- store: String
+- supplier: String
+- product_code: String
+- current_qty: Float
+- onway_qty: Float
+- avg_daily_sales: Float
+- lead_time: Integer
+- forecast: Float
+- safety_stock: Float
+- reorder_point: Float
+- min_qty: Float
+- order_qty: Float
+
+## Purpose
+
+This table allows the application to:
+- store generated order results
+- display order history
+- support analytics and dashboard visualizations
