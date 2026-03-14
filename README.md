@@ -29,8 +29,16 @@ Bachelor Project - Zurab Gignadze
 - Jinja2
 - Chart.js
 
+## System Architecture
+The project follows a layered architecture:
+- Frontend layer for user interaction
+- Backend layer for API and business logic
+- Database layer for storing generated orders
+- Service layer for validation and calculation
+
 ## გაშვების ინსტრუქცია
 1. პროექტის ფოლდერში გახსენით ტერმინალი
 2. დააყენეთ საჭირო ბიბლიოთეკები:
    ```bash
    pip install fastapi uvicorn sqlalchemy pandas openpyxl jinja2
+
