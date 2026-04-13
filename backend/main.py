@@ -7,8 +7,10 @@ import pandas as pd
 from database.database import get_db, engine
 from database.models import Base
 from database.crud import get_order_history
+from database.crud import save_order_results
 from services.validator import validate_file
 from services.calculator import calculate_orders
+
 
 app = FastAPI(title="Retail Order Automation System")
 templates = Jinja2Templates(directory="templates")
@@ -67,5 +69,12 @@ async def generate_order(files: list[UploadFile] = File(...)):
 
     return {
     "message": "Order calculation completed",
+    "rows": len(result_df)
+    }
+
+    save_order_results(db, result_df)
+
+    return {
+    "message": "Orders generated and saved successfully",
     "rows": len(result_df)
     }
