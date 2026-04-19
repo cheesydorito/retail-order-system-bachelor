@@ -45,7 +45,8 @@ def dashboard_page(request: Request):
 
 
 @app.post("/generate-order/")
-async def generate_order(files: list[UploadFile] = File(...)):
+async def generate_order(files: list[UploadFile] = File(...), db: Session = Depends(get_db)):
+
     if len(files) != 5:
         raise HTTPException(status_code=400, detail="Exactly 5 Excel files must be uploaded")
 
@@ -69,22 +70,16 @@ async def generate_order(files: list[UploadFile] = File(...)):
         validate_file(df, key)
         dataframes[key] = df
 
-    return {
-        "message": "Files uploaded and validated successfully",
-        "uploaded_files": list(dataframes.keys())
-
-    }
-    
     result_df = calculate_orders(dataframes)
-
-    return {
-    "message": "Order calculation completed",
-    "rows": len(result_df)
-    }
 
     save_order_results(db, result_df)
 
-    return {
-    "message": "Orders generated and saved successfully",
-    "rows": len(result_df)
-    }
+    excel_stream = dataframe_to_excel_stream(result_df)
+
+    return StreamingResponse(
+        excel_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=order_result.xlsx"
+        }
+    )
