@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Depends, UploadFile, File, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 import pandas as pd
@@ -10,10 +10,20 @@ from database.crud import get_order_history
 from database.crud import save_order_results
 from services.validator import validate_file
 from services.calculator import calculate_orders
+from io import BytesIO
 
 
 app = FastAPI(title="Retail Order Automation System")
 templates = Jinja2Templates(directory="templates")
+
+def dataframe_to_excel_stream(df):
+    output = BytesIO()
+
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
+        df.to_excel(writer, index=False, sheet_name="OrderResults")
+
+    output.seek(0)
+    return output
 
 Base.metadata.create_all(bind=engine)
 
