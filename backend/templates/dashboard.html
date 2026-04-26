@@ -2,8 +2,78 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="card shadow p-4">
-  <h3>Dashboard</h3>
-  <p>Analytics module will be added in later development stages.</p>
+
+<div class="card shadow p-4 mb-4">
+  <h3>Dashboard Analytics</h3>
 </div>
+
+<div class="card shadow p-4 mb-4">
+  <h5>Top Suppliers</h5>
+  <ul>
+    {% for supplier, qty in top_suppliers %}
+      <li>{{ supplier }} — {{ qty }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="card shadow p-4 mb-4">
+  <h5>Top Suppliers Chart</h5>
+  <canvas id="topSuppliersChart"></canvas>
+</div>
+
+<div class="card shadow p-4 mb-4">
+  <h5>Top Products</h5>
+  <ul>
+    {% for product, qty in top_products %}
+      <li>{{ product }} — {{ qty }}</li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="card shadow p-4 mb-4">
+  <h5>Top Products Chart</h5>
+  <canvas id="topProductsChart"></canvas>
+</div>
+
+<div class="card shadow p-4 mb-4">
+  <h5>Average Order Quantity: {{ avg_order_qty }}</h5>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const topSuppliers = {{ top_suppliers | tojson | safe }};
+    const topProducts = {{ top_products | tojson | safe }};
+
+    const supplierLabels = topSuppliers.map(x => x[0]);
+    const supplierData = topSuppliers.map(x => x[1]);
+
+    const productLabels = topProducts.map(x => x[0]);
+    const productData = topProducts.map(x => x[1]);
+
+    new Chart(document.getElementById('topSuppliersChart'), {
+      type: 'bar',
+      data: {
+        labels: supplierLabels,
+        datasets: [{
+          label: 'Total Ordered Qty',
+          data: supplierData,
+          borderWidth: 1
+        }]
+      }
+    });
+
+    new Chart(document.getElementById('topProductsChart'), {
+      type: 'bar',
+      data: {
+        labels: productLabels,
+        datasets: [{
+          label: 'Total Ordered Qty',
+          data: productData,
+          borderWidth: 1
+        }]
+      }
+    });
+</script>
+
 {% endblock %}
