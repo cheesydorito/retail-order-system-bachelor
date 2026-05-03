@@ -5,15 +5,37 @@
 
 <div class="card shadow p-4 mb-4">
   <h3>Dashboard Analytics</h3>
+
+  <form method="get" class="mt-3">
+    <div class="row g-3">
+      <div class="col">
+        <input type="text" name="store" class="form-control" placeholder="Store" value="{{ store or '' }}">
+      </div>
+      <div class="col">
+        <input type="text" name="supplier" class="form-control" placeholder="Supplier" value="{{ supplier or '' }}">
+      </div>
+      <div class="col">
+        <input type="text" name="product_code" class="form-control" placeholder="Product" value="{{ product_code or '' }}">
+      </div>
+      <div class="col">
+        <button class="btn btn-primary w-100">Apply Filters</button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <div class="card shadow p-4 mb-4">
   <h5>Top Suppliers</h5>
-  <ul>
-    {% for supplier, qty in top_suppliers %}
-      <li>{{ supplier }} — {{ qty }}</li>
-    {% endfor %}
-  </ul>
+
+  {% if top_suppliers %}
+    <ul>
+      {% for supplier, qty in top_suppliers %}
+        <li>{{ supplier }} — {{ qty }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No data available</p>
+  {% endif %}
 </div>
 
 <div class="card shadow p-4 mb-4">
@@ -23,11 +45,16 @@
 
 <div class="card shadow p-4 mb-4">
   <h5>Top Products</h5>
-  <ul>
-    {% for product, qty in top_products %}
-      <li>{{ product }} — {{ qty }}</li>
-    {% endfor %}
-  </ul>
+
+  {% if top_products %}
+    <ul>
+      {% for product, qty in top_products %}
+        <li>{{ product }} — {{ qty }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted">No data available</p>
+  {% endif %}
 </div>
 
 <div class="card shadow p-4 mb-4">
@@ -60,6 +87,15 @@
           data: supplierData,
           borderWidth: 1
         }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
       }
     });
 
@@ -72,6 +108,15 @@
           data: productData,
           borderWidth: 1
         }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
       }
     });
 </script>
