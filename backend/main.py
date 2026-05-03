@@ -41,11 +41,20 @@ def history_page(request: Request, db: Session = Depends(get_db)):
 @app.get("/ui/dashboard", response_class=HTMLResponse)
 def dashboard(
     request: Request,
+    store: str | None = None,
+    supplier: str | None = None,
+    product_code: str | None = None,
     db: Session = Depends(get_db)
 ):
-    orders = get_order_history(db)
+    orders = get_order_history(
+        db,
+        store=store,
+        supplier=supplier,
+        product_code=product_code
+    )
 
     df = pd.DataFrame([{
+        "store": o.store,
         "supplier": o.supplier,
         "product_code": o.product_code,
         "order_qty": o.order_qty
@@ -72,7 +81,10 @@ def dashboard(
             "request": request,
             "top_suppliers": top_suppliers,
             "top_products": top_products,
-            "avg_order_qty": avg_order_qty
+            "avg_order_qty": avg_order_qty,
+            "store": store,
+            "supplier": supplier,
+            "product_code": product_code
         }
     )
 
