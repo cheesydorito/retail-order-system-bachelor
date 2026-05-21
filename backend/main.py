@@ -127,3 +127,29 @@ async def generate_order(files: list[UploadFile] = File(...), db: Session = Depe
             "Content-Disposition": "attachment; filename=order_result.xlsx"
         }
     )
+
+@app.get("/export-history/")
+def export_history(db: Session = Depends(get_db)):
+
+    orders = get_order_history(db)
+
+    df = pd.DataFrame([
+        {
+            "ID": o.id,
+            "Store": o.store,
+            "Supplier": o.supplier,
+            "Product": o.product_code,
+            "Order Qty": o.order_qty
+        }
+        for o in orders
+    ])
+
+    excel_stream = dataframe_to_excel_stream(df)
+
+    return StreamingResponse(
+        excel_stream,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={
+            "Content-Disposition": "attachment; filename=order_history.xlsx"
+        }
+    )
