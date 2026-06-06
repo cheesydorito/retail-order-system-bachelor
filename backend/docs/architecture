@@ -34,6 +34,7 @@ The database layer stores generated order results and historical records.
 Database technology:
 - SQLite
 - SQLAlchemy ORM
+- SQL Server Management Studio
 
 ### 4. Service Layer
 The service layer contains the core business logic:
