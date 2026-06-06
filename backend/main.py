@@ -41,7 +41,13 @@ def dashboard(
     db: Session = Depends(get_db)
 ):
     orders = get_order_history(db, store=store, supplier=supplier, product_code=product_code)
-    df = pd.DataFrame([{"store": o.store, "supplier": o.supplier, "product_code": o.product_code, "order_qty": o.order_qty} for o in orders])
+    
+    df = pd.DataFrame([{
+        "store": o.store, 
+        "supplier": o.supplier, 
+        "product_code": o.product_code, 
+        "order_qty": o.order_qty
+    } for o in orders])
 
     if df.empty:
         top_suppliers, top_products, avg_order_qty = [], [], 0
@@ -83,7 +89,6 @@ async def generate_order(
                     f"მაგრამ თქვენ ატვირთეთ '{upload.filename}'."
                 )
 
-            #Excel-ის წაკითხვა
             try:
                 df = pd.read_excel(upload.file)
             except Exception:
@@ -98,6 +103,17 @@ async def generate_order(
         raise HTTPException(status_code=400, detail=str(e))
 
     result_df = calculate_orders(dataframes)
+    
+    if result_df.empty:
+        empty_info_df = pd.DataFrame([{"ინფორმაცია": "მიმდინარე კალენდარული დღისთვის შესაკვეთი გრაფიკები არ მოიძებნა"}])
+        excel_stream = dataframe_to_excel_stream(empty_info_df)
+        
+        return StreamingResponse(
+            excel_stream,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=no_orders_today.xlsx"}
+        )
+
     save_order_results(db, result_df)
     excel_stream = dataframe_to_excel_stream(result_df)
 
@@ -110,7 +126,22 @@ async def generate_order(
 @app.get("/export-history/")
 def export_history(db: Session = Depends(get_db)):
     orders = get_order_history(db)
-    df = pd.DataFrame([{"ID": o.id, "Store": o.store, "Supplier": o.supplier, "Product": o.product_code, "Order Qty": o.order_qty} for o in orders])
+    
+    df = pd.DataFrame([{
+        "ID": o.id, 
+        "Order Date": o.order_creation_date.strftime("%Y-%m-%d %H:%M") if o.order_creation_date else None,
+        "Delivery Date": o.delivery_date.strftime("%Y-%m-%d") if o.delivery_date else None,
+        "Store": o.store, 
+        "Supplier": o.supplier, 
+        "Product": o.product_code, 
+        "Current Qty": o.current_qty,
+        "OnWay Qty": o.onway_qty,
+        "Min Presentation Qty": o.min_qty,
+        "ADS (Avg Sales)": round(o.avg_daily_sales, 2) if o.avg_daily_sales else 0,
+        "Lead Time (Days)": o.lead_time,
+        "Order Qty": o.order_qty
+    } for o in orders])
+    
     excel_stream = dataframe_to_excel_stream(df)
     return StreamingResponse(
         excel_stream,

@@ -5,14 +5,15 @@ FILE_SCHEMAS = {
     "sales": ["date", "store", "supplier", "product_code", "sold_qty"],
     "onway_stock": ["date", "store", "supplier", "product_code", "onway_qty"],
     "MinQ": ["store", "product_code", "supplier", "min_qty"],
-    "Calendar": ["store", "supplier", "order_date", "delivery_date"]
+    "Calendar": ["store", "supplier", "order_day", "delivery_day"] 
 }
 
 NUMERIC_COLUMNS = {
     "current_stock": ["current_qty"],
     "sales": ["sold_qty"],
     "onway_stock": ["onway_qty"],
-    "MinQ": ["min_qty"]
+    "MinQ": ["min_qty"],
+    "Calendar": ["order_day", "delivery_day"]
 }
 
 REQUIRED_FILES = set(FILE_SCHEMAS.keys())
@@ -33,7 +34,6 @@ def validate_file(df: pd.DataFrame, file_key: str):
             raise ValueError(f"ფაილში '{file_key}' სვეტში '{col}' დაფიქსირდა უარყოფითი მნიშვნელობები")
 
 def validate_cross_data_consistency(dataframes: dict):
-
     master_df = dataframes["MinQ"]
     
     valid_stores = set(master_df["store"].unique())
@@ -48,7 +48,6 @@ def validate_cross_data_consistency(dataframes: dict):
             invalid_stores = set(df["store"].unique()) - valid_stores
             if invalid_stores:
                 raise ValueError(f"ფაილში '{key}' ნაპოვნია წინასწარ განუსაზღვრელი მაღაზია (Store): {invalid_stores}")
-
 
         if "supplier" in df.columns:
             invalid_suppliers = set(df["supplier"].unique()) - valid_suppliers
