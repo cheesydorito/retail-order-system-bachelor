@@ -105,7 +105,7 @@ async def generate_order(
     result_df = calculate_orders(dataframes)
     
     if result_df.empty:
-        empty_info_df = pd.DataFrame([{"ინფორმაცია": "მიმდინარე კალენდარული დღისთვის შესაკვეთი გრაფიკები არ მოიძებნა"}])
+        empty_info_df = pd.DataFrame([{"ინფორმაცია": "დღეს შეკვეთა არცერთ მაღაზიას არ უწევს."}])
         excel_stream = dataframe_to_excel_stream(empty_info_df)
         
         return StreamingResponse(

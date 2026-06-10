@@ -1,44 +1,76 @@
-\# Retail Order Automation System
-
-Bachelor Project - Zurab Gignadze
-
 # Retail Order Automation System
 
 **სტუდენტი:** ზურაბ გიგნაძე  
-**პროექტის ტიპი:** ინდივიდუალური  
-**საბაკალავრო პროექტის სათაური:** რითეილ კომპანიებისთვის შეკვეთების ავტომატური გენერაციისა და ანალიტიკის ვებ-სისტემის განვითარება
+**პროექტის ტიპი:** საბაკალავრო ინდივიდუალური პროექტი  
+**თემა:** რითეილ კომპანიებისთვის შეკვეთების ავტომატური გენერაციისა და ანალიტიკის ვებ-სისტემის განვითარება
 
-## პროექტის აღწერა
-პროექტის მიზანია რითეილ კომპანიებში შეკვეთების დაგეგმვის პროცესის ავტომატიზაცია. სისტემა მომხმარებელს საშუალებას აძლევს ატვირთოს Excel ფაილები, დაამუშავოს გაყიდვებისა და მარაგების მონაცემები, გამოთვალოს ოპტიმალური შეკვეთის რაოდენობა და შეინახოს შედეგები ისტორიული ანალიზისთვის.
+---
 
-## ძირითადი ფუნქციები
-- Excel ფაილების ატვირთვა
-- მონაცემთა ვალიდაცია
-- შეკვეთის რაოდენობის ავტომატური გამოთვლა
-- შედეგის Excel ფაილად ჩამოტვირთვა
-- შეკვეთების ისტორიის ნახვა
-- ანალიტიკური დეშბორდი
+## პროექტის მიმოხილვა
+ეს პროგრამული სისტემა შექმნილია მიწოდების ჯაჭვში (Supply Chain) მარაგების მართვისა და შესყიდვების პროცესისmავტომატიზაციისთვის. სისტემა ანაცვლებს ხელით მუშაობას: ატვირთულ ERP სისტემიდან ექსპორტირებულ საოპერაციო ექსელის ფაილებს უკეთებს მონაცემთა მკაცრ კროს-ვალიდაციას, ითვლის ოპტიმალურ საპროგნოზო შეკვეთებს Pandas მათემატიკური ძრავით და ინახავს შედეგებს ცენტრალიზებულ მონაცემთა ბაზაში ქრონოლოგიური ანალიზისთვის.
 
-## გამოყენებული ტექნოლოგიები
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- Pandas
-- HTML / CSS / Bootstrap
-- Jinja2
-- Chart.js
+## ძირითადი ფუნქციონალი
+* **მრავალფაილიანი ექსპორტ-იმპორტი:** 5 საოპერაციო ფაილის (`current_stock`, `sales`, `onway_stock`, `MinQ`, `Calendar`) ასინქრონული ატვირთვა.
+* **მკაცრი Guard-ვალიდაცია:** ფაილების სახელების, ფორმატებისა და შიდა სვეტების სტრუქტურული შემოწმება.
+* **Zero Disk I/O ოპტიმიზაცია:** ფაილების გენერირება პირდაპირ ოპერატიულ მეხსიერებაში (`io.BytesIO`) და მომენტალური სტრიმინგი კლიენტთან.
+* **შეკვეთების ისტორიის რეესტრი:** წარსულში შესრულებული ყველა გამოთვლის დაარქივება და მათი ხელახალი ექსპორტი ექსელში.
+* **ინტერაქციული ანალიტიკა:** ტოპ პროდუქტების, ტოპ მომწოდებლებისა და საშუალო შეკვეთების ვიზუალიზაცია დინამიკური ფილტრებით.
 
-## System Architecture
-The project follows a layered architecture:
-- Frontend layer for user interaction
-- Backend layer for API and business logic
-- Database layer for storing generated orders
-- Service layer for validation and calculation
+## ტექნოლოგიური სტეკი (Tech Stack)
+* **Backend:** FastAPI (Python 3.10+) - მაღალპერფორმანსული ასინქრონული ვებ-ბირთვი.
+* **Data Engine:** Pandas, OpenPyXL - დიდი მასივების ვექტორიზებული მათემატიკური გამოთვლებისთვის.
+* **Database & ORM:** Microsoft SQL Server, SQLAlchemy ORM - მონაცემთა ტიპების უსაფრთხოებისა და Row-level locking სტაბილურობისთვის.
+* **Frontend:** HTML5, CSS3, Bootstrap 5 - სრულად რესპონსიული მომხმარებლის ინტერფეისი.
+* **Visualization:** Chart.js - ინტერაქციული გრაფიკებისა და საოპერაციო დეშბორდისთვის.
 
-## გაშვების ინსტრუქცია
-1. პროექტის ფოლდერში გახსენით ტერმინალი
-2. დააყენეთ საჭირო ბიბლიოთეკები:
-   ```bash
-   pip install fastapi uvicorn sqlalchemy pandas openpyxl jinja2
+---
 
+## სისტემის არქიტექტურა (System Architecture)
+პროექტი მიყვება მრავალშრიანი არქიტექტურის (**N-Tier / Layered Architecture**) და **SOLID/DRY** პრინციპებს:
+
+```text
+my-retail-project/
+│
+├── database/            # Data Access Layer (Models, CRUD, DB Engine)
+├── services/            # Business Logic Layer (validator.py, calculator.py)
+├── templates/           # Presentation Layer (Jinja2 HTML Templates)
+├── main.py              # Controller Layer (FastAPI Routes & Application Core)
+└── requirements.txt     # პროექტის დამოკიდებულებები (Dependencies)
+ლოკალურად გაშვების ინსტრუქცია
+პროექტის საკუთარ ლოკალურ გარემოში გასაშვებად მიჰყევით ამ ნაბიჯებს:
+
+1. რეპოზიტორიის კლონირება დესკტოპზე
+გახსენით ტერმინალი (CMD) და გაუშვით ბრძანებები:
+
+Bash
+cd Desktop
+git clone [https://github.com/cheesydorito/retail-order-system-bachelor.git](https://github.com/cheesydorito/retail-order-system-bachelor.git)
+cd retail-order-system-bachelor
+2. ვირტუალური გარემოს შექმნა და აქტივაცია
+Bash
+python -m venv venv
+
+# გააქტიურება Windows-ისთვის:
+venv\Scripts\activate
+
+# გააქტიურება macOS/Linux-ისთვის:
+source venv/bin/activate
+3. ბიბლიოთეკების დაინსტალირება
+Bash
+pip install -r requirements.txt
+4. მონაცემთა ბაზის კონფიგურაცია
+დარწმუნდით, რომ თქვენს სისტემაში დაინსტალირებულია Microsoft ODBC Driver 17 for SQL Server და database/database.py ფაილში მითითებულია თქვენი ლოკალური სერვერის მისამართი:
+
+Python
+DATABASE_URL = "mssql+pyodbc://localhost/retail_db?driver=ODBC+Driver+17+for+SQL+Server"
+5. ვებ-სერვერის გაშვება
+Bash
+uvicorn main:app --reload
+სისტემა ხელმისაწვდომი იქნება მისამართზე: http://127.0.0.1:8000/ui/upload
+
+API დოკუმენტაცია (OpenAPI Standard)
+FastAPI ავტომატურად აგენერირებს ინტერაქციულ Swagger API დოკუმენტაციას, სადაც შეგიძლიათ იხილოთ ყველა ენდფოინთის მუშაობის პრინციპი და პარამეტრები. პროექტის ჩართვის შემდეგ გადადით მისამართზე:
+http://127.0.0.1:8000/docs
+
+ლიცენზია:
+ეს პროექტი ვრცელდება MIT ლიცენზიით.
