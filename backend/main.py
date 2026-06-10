@@ -7,7 +7,7 @@ from io import BytesIO
 
 from database.database import get_db, engine
 from database.models import Base
-from database.crud import get_order_history, save_order_results
+from database.crud import get_order_history, save_order_results, check_order_exists_for_today
 from services.validator import validate_file, validate_cross_data_consistency, REQUIRED_FILES
 from services.calculator import calculate_orders
 
@@ -101,6 +101,12 @@ async def generate_order(
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+        
+    if check_order_exists_for_today(db):
+        raise HTTPException(
+            status_code=400, 
+            detail="კრიტიკული შეცდომა: დღევანდელი თარიღით შეკვეთები უკვე გენერირებულია და ინახება მონაცემთა ბაზაში! დუბლირების თავიდან ასაცილებლად ოპერაცია შეჩერებულია."
+        )
 
     result_df = calculate_orders(dataframes)
     

@@ -37,3 +37,19 @@ def save_order_results(db: Session, df):
 
     db.bulk_save_objects(records)
     db.commit()
+
+def check_order_exists_for_today(db: Session) -> bool:
+    
+    #ამოწმებს არის თუ არა ბაზაში უკვე დაგენერირებული შეკვეთები დღევანდელი თარიღით
+    
+    from datetime import datetime
+    # ვიღებ დღევანდელ თარიღს 00:00:00-დან 23:59:59-მდე შუალედით
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_end = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
+    
+    exists = db.query(OrderResult).filter(
+        OrderResult.order_creation_date >= today_start,
+        OrderResult.order_creation_date <= today_end
+    ).first()
+    
+    return exists is not None
