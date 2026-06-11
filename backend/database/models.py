@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime, Unicode
 from database.database import Base
 
 class OrderResult(Base):
@@ -7,7 +7,7 @@ class OrderResult(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     store = Column(String(50))
-    supplier = Column(String(150))
+    supplier = Column(Unicode(150))
     product_code = Column(String(50))
     
     current_qty = Column(Float, default=0.0)      

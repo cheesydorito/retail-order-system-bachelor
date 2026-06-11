@@ -61,6 +61,8 @@ def calculate_orders(dataframes: dict) -> pd.DataFrame:
     #უარყოფით შეკვეთებს ავტომატურად ვანულებ (clip)
     df["order_qty"] = df["order_qty"].clip(lower=0)
 
+    df = df[df["order_qty"] > 0]
+
     #მიწოდების თარიღის გამოთვლა თითოეული სტრიქონისთვის lead_time-ის მიხედვით
     def compute_delivery_date(row):
         days_to_add = int(row["lead_time"])

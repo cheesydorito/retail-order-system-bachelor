@@ -5,6 +5,7 @@ DATABASE_URL = (
     "mssql+pyodbc://greatzura\\SQLEXPRESS/RetailOrderDB"
     "?driver=ODBC+Driver+17+for+SQL+Server"
     "&trusted_connection=yes"
+    "&CHARSET=UTF8"
 )
 
 engine = create_engine(DATABASE_URL)

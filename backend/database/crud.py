@@ -11,7 +11,7 @@ def get_order_history(db: Session, store=None, supplier=None, product_code=None)
     if product_code:
         query = query.filter(OrderResult.product_code == product_code)
 
-    return query.order_by(OrderResult.id.desc()).all()
+    return query.order_by(OrderResult.id.desc()).limit(100).all()
 
 
 def save_order_results(db: Session, df):
@@ -38,18 +38,19 @@ def save_order_results(db: Session, df):
     db.bulk_save_objects(records)
     db.commit()
 
-def check_order_exists_for_today(db: Session) -> bool:
+def get_today_ordered_stores(db: Session) -> list:
     
-    #ამოწმებს არის თუ არა ბაზაში უკვე დაგენერირებული შეკვეთები დღევანდელი თარიღით
-    
+    #აბრუნებს იმ მაღაზიების (store) სიას, რომლებისთვისაც დღეს უკვე დაგენერირდა შეკვეთა.
+
     from datetime import datetime
-    # ვიღებ დღევანდელ თარიღს 00:00:00-დან 23:59:59-მდე შუალედით
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
     
-    exists = db.query(OrderResult).filter(
+    # ვიღებ მხოლოდ უნიკალური მაღაზიების სახელებს, რომლებიც დღეს ჩაიწერა
+    results = db.query(OrderResult.store).filter(
         OrderResult.order_creation_date >= today_start,
         OrderResult.order_creation_date <= today_end
-    ).first()
+    ).distinct().all()
     
-    return exists is not None
+    # გარდავქმნი ტუპლების სიას ჩვეულებრივ ტექსტურ სიად: ['Store_A', 'Store_B']
+    return [r[0] for r in results]

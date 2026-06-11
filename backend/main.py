@@ -7,7 +7,7 @@ from io import BytesIO
 
 from database.database import get_db, engine
 from database.models import Base
-from database.crud import get_order_history, save_order_results, check_order_exists_for_today
+from database.crud import get_order_history, save_order_results, get_today_ordered_stores
 from services.validator import validate_file, validate_cross_data_consistency, REQUIRED_FILES
 from services.calculator import calculate_orders
 
@@ -102,11 +102,25 @@ async def generate_order(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
         
-    if check_order_exists_for_today(db):
-        raise HTTPException(
-            status_code=400, 
-            detail="კრიტიკული შეცდომა: დღევანდელი თარიღით შეკვეთები უკვე გენერირებულია და ინახება მონაცემთა ბაზაში! დუბლირების თავიდან ასაცილებლად ოპერაცია შეჩერებულია."
-        )
+    # ===== დინამიური გაფილტვრის ლოგიკა =====
+    #1. ვიღებ იმ მაღაზიებს, რომლებსაც დღეს უკვე აქვთ შეკვეთა ბაზაში
+    already_ordered_stores = get_today_ordered_stores(db)
+    
+    if already_ordered_stores:
+        # 2. კალენდრის ცხრილიდან ვშლი ამ მაღაზიებს
+        calendar_df = dataframes["Calendar"]
+        filtered_calendar = calendar_df[~calendar_df["store"].astype(str).str.strip().isin(already_ordered_stores)]
+        
+        #3. თუ ყველა მაღაზია უკვე ბაზაშია, მაშინვე ვაჩერებ პროცესს
+        if filtered_calendar.empty:
+            raise HTTPException(
+                status_code=400, 
+                detail="ყველა მაღაზიისთვის დღევანდელი შეკვეთები უკვე განთავსებულია ბაზაში!"
+            )
+        
+        # 4. თუ დარჩა საგენერირებლო მაღაზიები, განახლებულ კალენდარს ვაწვდი მონაცემებს
+        dataframes["Calendar"] = filtered_calendar
+    # =======================================
 
     result_df = calculate_orders(dataframes)
     
