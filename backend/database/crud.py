@@ -38,19 +38,26 @@ def save_order_results(db: Session, df):
     db.bulk_save_objects(records)
     db.commit()
 
-def get_today_ordered_stores(db: Session) -> list:
-    
-    #აბრუნებს იმ მაღაზიების (store) სიას, რომლებისთვისაც დღეს უკვე დაგენერირდა შეკვეთა.
-
+def get_today_orders_composite(db: Session) -> list:
+  
+    #აბრუნებს დღევანდელი შეკვეთების კომბინაციებს: (store, supplier, order_day)
+   
     from datetime import datetime
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999)
     
-    # ვიღებ მხოლოდ უნიკალური მაღაზიების სახელებს, რომლებიც დღეს ჩაიწერა
-    results = db.query(OrderResult.store).filter(
+    orders = db.query(OrderResult).filter(
         OrderResult.order_creation_date >= today_start,
         OrderResult.order_creation_date <= today_end
-    ).distinct().all()
+    ).all()
     
-    # გარდავქმნი ტუპლების სიას ჩვეულებრივ ტექსტურ სიად: ['Store_A', 'Store_B']
-    return [r[0] for r in results]
+    composite_list = []
+    for o in orders:
+        # ბაზაში შენახული თარიღიდან ვიგებ კვირის დღეს (1-7)
+        #order_creation_date არის რეალური გაშვების დღე ანუ order_day
+        weekday = o.order_creation_date.isoweekday()
+        
+        # ვინახავ გასუფთავებულ კომბინაციას (მაღაზია, მომწოდებელი, დღე)
+        composite_list.append((str(o.store).strip(), str(o.supplier).strip(), int(weekday)))
+        
+    return composite_list

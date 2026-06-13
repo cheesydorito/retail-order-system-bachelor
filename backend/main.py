@@ -4,10 +4,11 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 import pandas as pd
 from io import BytesIO
+from datetime import datetime
 
 from database.database import get_db, engine
 from database.models import Base
-from database.crud import get_order_history, save_order_results, get_today_ordered_stores
+from database.crud import get_order_history, save_order_results, get_today_orders_composite
 from services.validator import validate_file, validate_cross_data_consistency, REQUIRED_FILES
 from services.calculator import calculate_orders
 
@@ -102,25 +103,41 @@ async def generate_order(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
         
-    # ===== დინამიური გაფილტვრის ლოგიკა =====
-    #1. ვიღებ იმ მაღაზიებს, რომლებსაც დღეს უკვე აქვთ შეკვეთა ბაზაში
-    already_ordered_stores = get_today_ordered_stores(db)
+    # დინამიური ფილტრაცია (Composite Key) ==
+    from datetime import datetime
+    calendar_df = dataframes["Calendar"]
     
-    if already_ordered_stores:
-        # 2. კალენდრის ცხრილიდან ვშლი ამ მაღაზიებს
-        calendar_df = dataframes["Calendar"]
-        filtered_calendar = calendar_df[~calendar_df["store"].astype(str).str.strip().isin(already_ordered_stores)]
+    # 1. ჯერ კალენდარს ვფილტრავ მიმდინარე დღის მიხედვით
+    today_weekday = datetime.now().isoweekday()
+    active_calendar = calendar_df[calendar_df["order_day"].astype(float).astype(int) == today_weekday].copy()
+    
+    if active_calendar.empty:
+        raise HTTPException(status_code=400, detail="დღევანდელ დღეს შეკვეთა არცერთ მაღაზიას არ უწევს კალენდრის მიხედვით.")
+
+    # 2. ბაზიდან ვიღებ დღევანდელ უკვე არსებულ კომბინაციებს (store, supplier, order_day)
+    existing_records = get_today_orders_composite(db)
+    
+    if existing_records:
+        # 3. Pandas-ში ვფილტრავ სტრიქონ-სტრიქონ კომბინაციის შემოწმებით
+        def is_duplicate(row):
+            store = str(row["store"]).strip()
+            supplier = str(row["supplier"]).strip()
+            order_day = int(float(row["order_day"]))
+            return (store, supplier, order_day) in existing_records
+
+        #ვტოვებ მხოლოდ იმ სტრიქონებს, რომლებიც ბაზაში არ მოიძებნა
+        filtered_calendar = active_calendar[~active_calendar.apply(is_duplicate, axis=1)]
         
-        #3. თუ ყველა მაღაზია უკვე ბაზაშია, მაშინვე ვაჩერებ პროცესს
         if filtered_calendar.empty:
             raise HTTPException(
                 status_code=400, 
-                detail="ყველა მაღაზიისთვის დღევანდელი შეკვეთები უკვე განთავსებულია ბაზაში!"
+                detail="შეცდომა: კალენდრის ამ ვერსიით ყველა მაღაზია/მომწოდებლის შეკვეთა ამ დღისთვის უკვე ბაზაშია!"
             )
         
-        # 4. თუ დარჩა საგენერირებლო მაღაზიები, განახლებულ კალენდარს ვაწვდი მონაცემებს
         dataframes["Calendar"] = filtered_calendar
-    # =======================================
+    else:
+        dataframes["Calendar"] = active_calendar
+    # =============================================================
 
     result_df = calculate_orders(dataframes)
     

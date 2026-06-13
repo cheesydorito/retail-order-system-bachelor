@@ -18,12 +18,8 @@ def calculate_orders(dataframes: dict) -> pd.DataFrame:
     minq = dataframes["MinQ"]
     calendar = dataframes["Calendar"]
 
-    #მიმდინარე კვირის დღის განსაზღვრა (1 = ორშაბათი, 7 = კვირა)
     today_dt = datetime.now()
-    today_weekday = today_dt.isoweekday() 
-
-    #კალენდრის გაფილტვრა მიმდინარე დღის მიხედვით (მხოლოდ მათთვის, ვისაც დღეს უწევს შეკვეთა)
-    active_calendar = calendar[calendar["order_day"].astype(float).astype(int) == today_weekday]
+    active_calendar = calendar
 
     #Edge Case: თუ დღეს არცერთ მაღაზიას/მომწოდებელს არ უწევს შეკვეთა, ცარიელ ცხრილს ვაბრუნებთ
     if active_calendar.empty:
