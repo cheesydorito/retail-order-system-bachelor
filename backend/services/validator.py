@@ -4,7 +4,7 @@ FILE_SCHEMAS = {
     "current_stock": ["date", "store", "supplier", "product_code", "current_qty"],
     "sales": ["date", "store", "supplier", "product_code", "sold_qty"],
     "onway_stock": ["date", "store", "supplier", "product_code", "onway_qty"],
-    "MinQ": ["store", "product_code", "supplier", "min_qty"],
+    "MinQ": ["store", "product_code", "supplier", "min_qty", "rounding"],  # დავამატე rounding
     "Calendar": ["store", "supplier", "order_day", "delivery_day"] 
 }
 
@@ -12,7 +12,7 @@ NUMERIC_COLUMNS = {
     "current_stock": ["current_qty"],
     "sales": ["sold_qty"],
     "onway_stock": ["onway_qty"],
-    "MinQ": ["min_qty"],
+    "MinQ": ["min_qty", "rounding"],  #დავამატე rounding
     "Calendar": ["order_day", "delivery_day"]
 }
 
@@ -32,6 +32,10 @@ def validate_file(df: pd.DataFrame, file_key: str):
     for col in NUMERIC_COLUMNS.get(file_key, []):
         if (df[col] < 0).any():
             raise ValueError(f"ფაილში '{file_key}' სვეტში '{col}' დაფიქსირდა უარყოფითი მნიშვნელობები")
+            
+        # სპეციალური შემოწმება rounding-ისთვის: ჯერადი არ შეიძლება იყოს 0
+        if file_key == "MinQ" and col == "rounding" and (df[col] <= 0).any():
+            raise ValueError("ფაილში 'MinQ' სვეტი 'rounding' (ჯერადი) უნდა იყოს 0-ზე მეტი მთელი ციფრი!")
 
 def validate_cross_data_consistency(dataframes: dict):
     master_df = dataframes["MinQ"]

@@ -14,7 +14,8 @@ class OrderResult(Base):
     onway_qty = Column(Float, default=0.0)        
     min_qty = Column(Float, default=0.0)          
     avg_daily_sales = Column(Float, default=0.0)  
-    lead_time = Column(Integer)                   
+    lead_time = Column(Integer)    
+    rounding = Column(Integer, default=1)               
     order_qty = Column(Float)                     
     
     order_creation_date = Column(DateTime, default=datetime.now) 

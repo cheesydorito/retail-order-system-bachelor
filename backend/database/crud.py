@@ -28,6 +28,7 @@ def save_order_results(db: Session, df):
             min_qty=float(row["min_qty"]),
             avg_daily_sales=float(row["avg_daily_sales"]),
             lead_time=int(row["lead_time"]),
+            rounding=int(row["rounding"]),
             order_qty=float(row["order_qty"]),
             order_creation_date=row["order_creation_date"],
             delivery_date=row["delivery_date"]

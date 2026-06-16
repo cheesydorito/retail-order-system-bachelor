@@ -176,6 +176,7 @@ def export_history(db: Session = Depends(get_db)):
         "Min Presentation Qty": o.min_qty,
         "ADS (Avg Sales)": round(o.avg_daily_sales, 2) if o.avg_daily_sales else 0,
         "Lead Time (Days)": o.lead_time,
+        "Rounding (Pack)": o.rounding,
         "Order Qty": o.order_qty
     } for o in orders])
     
